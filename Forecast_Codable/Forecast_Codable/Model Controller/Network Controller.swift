@@ -18,7 +18,7 @@ class NetworkController {
     private static let kAPIKeyValue = "231a707c02074a7f9088dd6191472bde"
     
     //MARK: - Helper Functions
-    static func fetchDays(completion: @escaping ([Day]?) -> Void) {
+    static func fetchDays(completion: @escaping (TopLevelDictionary?) -> Void) {
         guard let baseURL = URL(string: baseURLString) else { completion(nil); return}
         
         // MARK: - QUERY ITEMS
@@ -27,7 +27,8 @@ class NetworkController {
         
         let keyQuery = URLQueryItem(name: kAPIKeyKey, value: kAPIKeyValue)
         let cityQuery = URLQueryItem(name: kCityNameKey, value: kCityNameValue)
-        urlComponents?.queryItems = [keyQuery, cityQuery]
+        let unitsQuery = URLQueryItem(name: "units", value: "I")
+        urlComponents?.queryItems = [keyQuery, cityQuery, unitsQuery]
         
         // FinalURL
         guard let finalURL = urlComponents?.url else { completion(nil); return}
@@ -40,8 +41,8 @@ class NetworkController {
             }
             guard let data = dayData else { completion(nil); return }
             do {
-                let forecastData = try JSONDecoder().decode(TopLevelDictionary.self , from: data)
-                completion(forecastData.days)
+                let topLevelDictionary = try JSONDecoder().decode(TopLevelDictionary.self , from: data)
+                completion(topLevelDictionary)
             } catch {
                 print("Error in Do/Try/Catch: \(error.localizedDescription)")
                 completion(nil); return
